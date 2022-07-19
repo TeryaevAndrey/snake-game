@@ -1,6 +1,9 @@
 const game = document.querySelector("#game");
 const context = game.getContext("2d");
-const score = document.querySelector(".score");
+const score = document.querySelector(".score-value");
+const startBtn = document.querySelector("#start");
+const resetBtn = document.querySelector("#reset");
+const endGame = document.querySelector(".end-game");
 
 const foodImg = new Image();
 foodImg.src = "images/apple.png";
@@ -10,6 +13,7 @@ const grid = 30;
 let scoreValue = 0;
 let direction = "";
 let movement;
+let speed = 1000 / 15;
 
 score.textContent = scoreValue.toString();
 
@@ -21,16 +25,20 @@ let food = {
 
 let snake = [];
 snake[0] = {
-    x: game.clientWidth / 2,
-    y: game.clientHeight / 2
+    x: game.width / 2,
+    y: game.height / 2
 }
 
 document.addEventListener("keydown", getDirection);
+startBtn.addEventListener("click", startGame);
+resetBtn.addEventListener("click", resetGame);
+
+resetBtn.setAttribute("disabled", "true");
 
 function showGame() {
     context.beginPath();
     context.fillStyle = "#333";
-    context.fillRect(0, 0, game.clientWidth, game.clientHeight);
+    context.fillRect(0, 0, game.width, game.height);
     context.drawImage(food.img, food.x, food.y, grid, grid);
 
     for(let snakeCell = 0; snakeCell < snake.length; snakeCell++) {
@@ -62,11 +70,16 @@ function showGame() {
             img: foodImg
         };
 
-        scoreValue++
+        scoreValue++;
         score.textContent = scoreValue.toString();
     } else {
         snake.pop();
     }
+
+    if(snakeX >= game.width) newSnakeCell.x = 0;
+    if(snakeX < 0) newSnakeCell.x = game.width;
+    if(snakeY >= game.width) newSnakeCell.y = 0;
+    if(snakeY < 0) newSnakeCell.y = game.height;
 
     eatSnake(newSnakeCell, snake);
 
@@ -88,8 +101,38 @@ function eatSnake(head, snakeArr) {
     for(let i = 0; i < snakeArr.length; i++) {
         if(head.x === snakeArr[i].x && head.y === snakeArr[i].y) {
             clearInterval(movement);
+            endGame.textContent = "Ваш счет: " + scoreValue.toString();
+            endGame.style.display = "block";
         }
     }
 }
 
-movement = setInterval(showGame, 1000 / 15);
+function startGame() {
+    endGame.style.display = "none";
+    movement = setInterval(showGame, speed);
+    startBtn.setAttribute("disabled", "true");
+    resetBtn.removeAttribute("disabled");
+}
+
+function resetGame() {
+    endGame.style.display = "none";
+    clearInterval(movement);
+    scoreValue = 0;
+    score.textContent = scoreValue.toString();
+
+    snake = [];
+    snake[0] = {
+        x: game.width / 2,
+        y: game.height / 2
+    };
+
+    food = {
+        x: Math.floor(Math.random() * 20) * grid,
+        y: Math.floor(Math.random() * 20) * grid,
+        img: foodImg
+    };
+
+    direction = "";
+    movement = setInterval(showGame, speed);
+}
+

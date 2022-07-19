@@ -52,14 +52,12 @@ button {
 }
 
 .score {
-    font-size: 32px;
-}
-
-.score span {
     font-size: 24px;
 }
 
 .game {
+    position: relative;
+    background-color: #333;
     width: 600px;
     height: 600px;
 }
@@ -83,4 +81,24 @@ button {
 
 .game-btn:hover {
     box-shadow: 0 0 10px #c29019;
+}
+
+.end-game {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 64px;
+}
+
+@media(max-width: 600px) {
+    .game {
+        width: 350px;
+        height: 350px;
+    }
+
+    .score {
+        font-size: 16px;
+    }
 }
